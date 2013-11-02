@@ -4,7 +4,6 @@ e_primo(3).
 e_primo(5).
 e_primo(7).
 e_primo(11).
-% ...
 
 soma_de_2_naturais(X, [T1,T2]):-
 	X is T1 + T2.
