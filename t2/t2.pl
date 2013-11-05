@@ -13,14 +13,7 @@ conexoesCom(CidadeA, [[WO, WD, WC]|T], [[WO, WD, WC]|Conexoes]):-
 conexoesCom(CidadeA, [[WO, WD, WC]|T], Conexoes):-
 	conexoesCom(CidadeA, T, Conexoes).
 	
-
 vizinhoMaisProximo(CidadeA, [H|T], ListaVisitados, MaisProximo, Custo).
-
-
-
-
-
-
 
 custo(CidadeA, CidadeB, [H|_], Custo):-
 	splitCusto(H, CidadeA, CidadeB, Custo),

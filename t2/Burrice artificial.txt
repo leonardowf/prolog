@@ -1,0 +1,12 @@
+Burrice artificial, plano:
+
+- Pegar aleatorio X e guardar como o início
+(P:)- Por X na lista de visitados
+- Verificar se todas as cidades foram visitadas
+{Caso sim: escolher X e adicionar a caminho, somar e dar resposta}
+{Caso não:
+- pegar todos os caminhos de X
+- escolher um caminho aleatorio R não visitado
+- por na lista de caminhos
+- R->destino agora é X. Ir para P
+}
