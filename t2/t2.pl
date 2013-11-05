@@ -12,8 +12,6 @@ conexoesCom(CidadeA, [[WO, WD, WC]|T], [[WO, WD, WC]|Conexoes]):-
 
 conexoesCom(CidadeA, [[WO, WD, WC]|T], Conexoes):-
 	conexoesCom(CidadeA, T, Conexoes).
-	
-vizinhoMaisProximo(CidadeA, [H|T], ListaVisitados, MaisProximo, Custo).
 
 custo(CidadeA, CidadeB, [H|_], Custo):-
 	splitCusto(H, CidadeA, CidadeB, Custo),
@@ -24,6 +22,16 @@ custo(CidadeA, CidadeB, [_|T], Custo):-
 splitCusto([CidadeA, CidadeB, Custo], CidadeA, CidadeB, Custo).
 splitCusto([CidadeA, CidadeB, Custo], CidadeB, CidadeA, Custo).
 
-aleatorio(R):-
-	R is random(60) + 1.
-	
+aleatorio(Maximo, R):-
+	R is random(Maximo) + 1.
+
+primeira(NumCidades, [EscolhidoInicial|Visitados]):-
+	aleatorio(NumCidades, EscolhidoInicial),
+	core([Visitados]).
+
+core([HVisitados|Tvisitados]):-
+	write(HVisitados).
+
+
+
+
