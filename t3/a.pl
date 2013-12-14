@@ -17,49 +17,63 @@ heuristica(Lista, Total):-
 	Parcial is TotalHorizontal + TotalVertical,
 	Total is Parcial + TotalDiagonal.
 
-pegaQuatro([Linha, Coluna], Resultado):-
-	Coluna is 3,
-	pegaEsquerda(1, [Linha, Coluna], ResultadoEsquerda),
-	pegaDireita(2, [Linha, Coluna], ResultadoDireita),
-	append(ResultadoEsquerda, ResultadoDireita, Resultado).
+delMember(X, [], []) :- !.
+delMember(X, [X|Xs], Y) :- !, delMember(X, Xs, Y).
+delMember(X, [T|Xs], Y) :- !, delMember(X, Xs, Y2), append([T], Y2, Y).
 
-pegaQuatro([Linha, Coluna], Resultado):-
-	Coluna is 2,
-	pegaEsquerda(1, [Linha, Coluna], ResultadoEsquerda),
-	pegaDireita(2, [Linha, Coluna], ResultadoDireita),
-	append(ResultadoEsquerda, ResultadoDireita, Resultado).
+overlapHorizontal([Linha, Coluna], Resultado):-
+	teste(-4, [Linha, Coluna], ResultadoComErro),
+	delMember(errado, ResultadoComErro, Resultado).
+	
 
-pegaQuatro([Linha, Coluna], Resultado):-
-	QuantidadeDireita is 4 - Coluna,
-	QuantidadeEsquerda is 3 - QuantidadeDireita,
-	pegaDireita(QuantidadeDireita, [Linha, Coluna], Resultado).
+teste(4, [Linha, Coluna], []):-
+	!.
+teste(QuantidadeShift, [Linha, Coluna], [H|T]):-
+	MaisUm is QuantidadeShift + 1,
+	NovaColuna is Coluna + QuantidadeShift,
+	NovaColuna =< Coluna,
+	shift(QuantidadeShift, [Linha, Coluna], H),
+	teste(MaisUm, [Linha, Coluna], T),
+	!.
 
-pegaDireita(0, [Linha, Coluna], []).
-pegaDireita(Quantidade, [Linha, Coluna], [[Linha, NovaColuna]|T]):-
-	NovaColuna is Coluna + 1,
-	MenosUm is Quantidade - 1,
-	pegaDireita(MenosUm, [Linha, NovaColuna], T).
+teste(QuantidadeShift, [Linha, Coluna], []):-
+	!.
 
-pegaEsquerda(0, [Linha, Coluna], []).
-pegaEsquerda(Quantidade, [Linha, Coluna], [[Linha, NovaColuna]|T]):-
-	NovaColuna is Coluna - 1,
-	MenosUm is Quantidade - 1,
-	pegaEsquerda(MenosUm, [Linha, NovaColuna], T).
+	
+shift(QuantidadeShift, [Linha, Coluna], errado):-
+	NovaColuna is Coluna + QuantidadeShift,
+	NovaColuna < 1,
+	!.
+shift(QuantidadeShift, [Linha, Coluna], errado):-
+	NovaColuna is Coluna + QuantidadeShift,
+	NovaColuna > 7,
+	!.
+shift(QuantidadeShift, [Linha, Coluna], errado):-
+	NovaColuna is Coluna + QuantidadeShift,
+	LimiteInferior is Coluna - 4,
+	NovaColuna =< LimiteInferior,
+	!.
+shift(QuantidadeShift, [Linha, Coluna], errado):-
+	NovaColuna is Coluna + QuantidadeShift,
+	Ultimo is NovaColuna + 3,
+	Ultimo > 7,
+	!.
 
-regraColuna(Coluna, Esquerda, Direita):-
-	Coluna is 1,
-	Esquerda is 0,
-	Direita is 3.
+shift(QuantidadeShift, [Linha, Coluna], Resultado):-
+	NovaColuna is Coluna + QuantidadeShift,
+	montaDeslocamento(0, [Linha, NovaColuna], Resultado),
+	!.
 
-regraColuna(Coluna, Esquerda, Direita):-
-	Coluna is 2,
-	Esquerda is 1,
-	Direita is 2.
+montaDeslocamento(4, [Linha, Coluna], []):-
+	!.
+montaDeslocamento(Adicionados, [Linha, Coluna], [[Linha, NovaColuna]|T]):-
+	NovoAdicionados is Adicionados + 1,
+	NovaColuna is Coluna + Adicionados,
+	montaDeslocamento(NovoAdicionados, [Linha, Coluna], T),
+	!.
 
-regraColuna(Coluna, Esquerda, Direita):-
-	Coluna is 3,
-	Esquerda is 2,
-	Direita is 1.
+
+
 
 
 	
