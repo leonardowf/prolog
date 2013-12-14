@@ -1,8 +1,37 @@
 % Aluno: Leonardo Wistuba de França
 % GRR: 20093551
 
+% [[[1, 4], [1, 5], [1, 6], [1, 7]]].
 heuristica_horizontal(Lista, [Linha, Coluna],  Total):-
-	Total is 10.
+	meuAppend([Linha, Coluna], Lista, ComProvavelNovoEle),
+	overlapHorizontal([Linha, Coluna], Overlaps),
+	paraTodosOverlaps(Overlaps, ComProvavelNovoEle, Total),
+	!.
+
+meuAppend(Ele, Lista, [Ele|Lista]).
+
+paraTodosOverlaps([], Lista, 0).
+paraTodosOverlaps([UmOverlap|TailOverlaps], Lista, Total):-
+	paraTodosOverlaps(TailOverlaps, Lista, TotalContado),
+	contaOverlap(UmOverlap, Lista, ContagemOverLap),
+	score(ContagemOverLap, Pontuacao),
+	Total is Pontuacao + TotalContado.
+
+contaOverlap([], Lista, 0):- !.
+contaOverlap([HOverlap|TOverlap], Lista, Aparicoes):-
+	% Se HeadOverlap Pertence a Lista, aumenta aparicoes
+	member(HOverlap, Lista),
+	contaOverlap(TOverlap, Lista, DentroAparicoes),
+	Aparicoes is DentroAparicoes + 1,
+	!.
+contaOverlap([HOverlap|TOverlap], Lista, Aparicoes):-
+	contaOverlap(TOverlap, Lista, Aparicoes),
+	!.
+
+contains(_, []).
+contains(L1, [X | L2]) :-
+    member(X, L1),
+    contains(L1, L2).
 
 heuristica_vertical(Lista, [Linha, Coluna],  Total):-
 	Total is 20.
@@ -25,7 +54,6 @@ overlapHorizontal([Linha, Coluna], Resultado):-
 	teste(-4, [Linha, Coluna], ResultadoComErro),
 	delMember(errado, ResultadoComErro, Resultado).
 	
-
 teste(4, [Linha, Coluna], []):-
 	!.
 teste(QuantidadeShift, [Linha, Coluna], [H|T]):-
@@ -72,8 +100,10 @@ montaDeslocamento(Adicionados, [Linha, Coluna], [[Linha, NovaColuna]|T]):-
 	montaDeslocamento(NovoAdicionados, [Linha, Coluna], T),
 	!.
 
-
-
+score(1, 1).
+score(2, 4).
+score(3, 32).
+score(4, 10000).
 
 
 	
