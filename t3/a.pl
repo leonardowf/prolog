@@ -34,15 +34,15 @@ contains(L1, [X | L2]) :-
     contains(L1, L2).
 
 heuristica_vertical(Lista, [Linha, Coluna],  Total):-
-	Total is 20.
+	Total is 0.
 
 heuristica_diagonal(Lista, [Linha, Coluna],  Total):-
-	Total is 30.
+	Total is 0.
 
-heuristica(Lista, Total):-
-	heuristica_horizontal(Lista, [1, 1], TotalHorizontal),
-	heuristica_vertical(Lista, [1, 1], TotalVertical),
-	heuristica_diagonal(Lista, [1, 1], TotalDiagonal),
+heuristica([Linha, Coluna], Lista, Total):-
+	heuristica_horizontal(Lista, [Linha, Coluna], TotalHorizontal),
+	heuristica_vertical(Lista, [Linha, Coluna], TotalVertical),
+	heuristica_diagonal(Lista, [Linha, Coluna], TotalDiagonal),
 	Parcial is TotalHorizontal + TotalVertical,
 	Total is Parcial + TotalDiagonal.
 
