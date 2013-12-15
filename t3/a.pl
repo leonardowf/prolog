@@ -23,15 +23,21 @@ minimax(Lista, Jogador, TabuleiroAnterior, 0, ValorHeuristica):-
 	escolheTabuleiro(Lista, Jogador, TabuleiroCerto),
 	heuristica(UltimoJogado, TabuleiroCerto, ValorHeuristica).
 
-minimax([EstadoJogadorA, EstadoJogadorB], Jogador,TabuleiroAnterior, Altura, ScoresAdjacentes):-
+minimax([EstadoJogadorA, EstadoJogadorB], Jogador,TabuleiroAnterior, Altura, AdjacenteEscolhido):-
 	todosAdjacentes([EstadoJogadorA, EstadoJogadorB], Jogador, TodosAdjacentes),
 	% trace,
 	 AlturaMenosUm is Altura - 1,
  	paraCadaAdjacente(TodosAdjacentes, [EstadoJogadorA, EstadoJogadorB], Jogador, AlturaMenosUm, ScoresAdjacentes),
  	trace,
- 	escolheOpcao(ScoresAdjacentes, Modo, IndiceEscolhido).
+ 	escolheOpcao(ScoresAdjacentes, maior, ItemEscolhido),
+ 	indexOf(ScoresAdjacentes, ItemEscolhido, IndexEscolhido),
+ 	elemento(TodosAdjacentes, IndexEscolhido, AdjacenteEscolhido).
  	% olhar lista de notas e descobrir pra onde ir
 
+elemento([H|T], 0, H).
+elemento([H|T], Indice, Elemento):-
+	NovoIndice is Indice - 1,
+	elemento(T, NovoIndice, Elemento).
 
 paraCadaAdjacente([], [_, _], _, _, []).
 paraCadaAdjacente([[HAdjacenteJogadorA, HAdjacenteJogadorB]|TAdjacente], [EstadoJogadorA, EstadoJogadorB], a, Altura, [ValorMiniMax|NotasTail]):-
@@ -40,10 +46,10 @@ paraCadaAdjacente([[HAdjacenteJogadorA, HAdjacenteJogadorB]|TAdjacente], [Estado
 	paraCadaAdjacente(TAdjacente, [EstadoJogadorA, EstadoJogadorB], a, Altura, NotasTail).
 
 escolheOpcao(ScoresAdjacentes, maior, Maior):-
-	smallest(ScoresAdjacentes, Maior).
+	biggest(ScoresAdjacentes, Maior).
 
 escolheOpcao(ScoresAdjacentes, menor, Menor):-
-	biggest(ScoresAdjacentes, Menor).
+	smallest(ScoresAdjacentes, Menor).
 
 smaller(X, Y, X):-
   (X =< Y).
@@ -249,6 +255,11 @@ praCada([], _).
 append([X|Y],Z,[X|W]):-
 	append(Y,Z,W).  
 append([],X,X).
+
+indexOf([Element|_], Element, 0). % We found the element
+indexOf([_|Tail], Element, Index):-
+  indexOf(Tail, Element, Index1), % Check in the tail of the list
+  Index is Index1+1.  % and increment the resulting index
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%Trabalho 1%%%%%%%%%%%%%%%%%%%
