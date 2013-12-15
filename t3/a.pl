@@ -1,8 +1,11 @@
 % Aluno: Leonardo Wistuba de França
 % GRR: 20093551
 
+% TODO HEURISTICA DIAGONAL :/
+% TODO ALFA BETA
 
-plausivel([EstadoJogadorA, EstadoJogadorB], Jogador, Altura, Res).
+plausivel([EstadoJogadorA, EstadoJogadorB], Jogador, Altura, Res):-
+	respostaMinimax([EstadoJogadorA, EstadoJogadorB], Jogador, [], Altura, maior, Res).
 
 todosAdjacentes([EstadoJogadorA, EstadoJogadorB], Jogador, Resultado):-
 	findall(X, adjacente([EstadoJogadorA, EstadoJogadorB], Jogador, X),Resultado).
@@ -10,27 +13,27 @@ todosAdjacentes([EstadoJogadorA, EstadoJogadorB], Jogador, Resultado):-
 last([Elem], Elem).
 last([_|Tail], Elem) :- last(Tail, Elem).
 
-ultimoJogado([TabuleiroJogadorA, TabuleiroJogadorB], a, UltimoJogado):-
+ultimoJogado([TabuleiroJogadorA, _], a, UltimoJogado):-
 	last(TabuleiroJogadorA, UltimoJogado).
-ultimoJogado([TabuleiroJogadorA, TabuleiroJogadorB], b, UltimoJogado):-
+ultimoJogado([_, TabuleiroJogadorB], b, UltimoJogado):-
 	last(TabuleiroJogadorB, UltimoJogado).
 
-escolheTabuleiro([JogadorA, JogadorB], a, JogadorA).
-escolheTabuleiro([JogadorA, JogadorB], b, JogadorB).
+escolheTabuleiro([JogadorA, _], a, JogadorA).
+escolheTabuleiro([_, JogadorB], b, JogadorB).
 
 respostaMinimax(Lista, Jogador, TabuleiroAnterior, Altura, Modo, Resposta):-
 	todosAdjacentes(Lista, Jogador, TodosAdjacentes),
 	%trace,
-	minimax(Lista, Jogador, TabuleiroAnterior, Altura, Modo, 0, [Score, Indice], Simples),
+	minimax(Lista, Jogador, TabuleiroAnterior, Altura, Modo, 0, [_, Indice], _),
 	elemento(TodosAdjacentes, Indice, Resposta).
 
-minimax(Lista, Jogador, TabuleiroAnterior, 0, Modo, IndiceAdjacente, [ValorHeuristica, IndiceAdjacente], ValorHeuristica):-
+minimax(Lista, Jogador, _, 0, _, IndiceAdjacente, [ValorHeuristica, IndiceAdjacente], ValorHeuristica):-
 	inverteJogador(Jogador, JogadorInvertido),
 	ultimoJogado(Lista, JogadorInvertido, UltimoJogado),
 	escolheTabuleiro(Lista, JogadorInvertido, TabuleiroCerto),
 	heuristica(UltimoJogado, TabuleiroCerto, ValorHeuristica).
 
-minimax([EstadoJogadorA, EstadoJogadorB], Jogador, TabuleiroAnterior, Altura, Modo, IndiceAdjacente, ItemEscolhido, Simples):-
+minimax([EstadoJogadorA, EstadoJogadorB], Jogador, _, Altura, Modo, IndiceAdjacente, ItemEscolhido, Simples):-
 	todosAdjacentes([EstadoJogadorA, EstadoJogadorB], Jogador, TodosAdjacentes),
 	%trace,
 	 AlturaMenosUm is Altura - 1,
@@ -38,21 +41,21 @@ minimax([EstadoJogadorA, EstadoJogadorB], Jogador, TabuleiroAnterior, Altura, Mo
 	inverteJogador(Jogador, JogadorInvertido),
  	paraCadaAdjacente(TodosAdjacentes, [EstadoJogadorA, EstadoJogadorB], JogadorInvertido, AlturaMenosUm, ModoInvertido, IndiceAdjacente, ScoresAdjacentes, SimplesScores),
  	%trace,
- 	write(ScoresAdjacentes),
- 	write(SimplesScores),
+ 	%write(ScoresAdjacentes),
+ 	%write(SimplesScores),
  	%% primeiro(ScoresAdjacentes, ItemEscolhido).
  	escolheOpcao(SimplesScores, Modo, Simples),
  	indexOf(SimplesScores, Simples, IndexEscolhido),
  	elemento(ScoresAdjacentes, IndexEscolhido, ItemEscolhido).
 
- primeiro([H|T], H).
+ primeiro([H|_], H).
 
-paraCadaAdjacente([], [_, _], _, _, _, IndiceAdjacente, [], []).
-paraCadaAdjacente([[HAdjacenteJogadorA, HAdjacenteJogadorB]|TAdjacente], [EstadoJogadorA, EstadoJogadorB], a, Altura, Modo, IndiceAdjacente, [ValorMiniMax|NotasTail], [Simples|SimplesTail]):-
+paraCadaAdjacente([], [_, _], _, _, _, _, [], []).
+paraCadaAdjacente([[_, HAdjacenteJogadorB]|TAdjacente], [EstadoJogadorA, EstadoJogadorB], a, Altura, Modo, IndiceAdjacente, [ValorMiniMax|NotasTail], [Simples|SimplesTail]):-
 	IndiceMaisUm is IndiceAdjacente + 1,
 	minimax([EstadoJogadorA, HAdjacenteJogadorB], a, [EstadoJogadorA, EstadoJogadorB], Altura, Modo, IndiceAdjacente, ValorMiniMax, Simples),
 	paraCadaAdjacente(TAdjacente, [EstadoJogadorA, EstadoJogadorB], a, Altura, Modo,IndiceMaisUm, NotasTail, SimplesTail).
-paraCadaAdjacente([[HAdjacenteJogadorA, HAdjacenteJogadorB]|TAdjacente], [EstadoJogadorA, EstadoJogadorB], b, Altura, Modo,IndiceAdjacente, [ValorMiniMax|NotasTail], [Simples|SimplesTail]):-
+paraCadaAdjacente([[HAdjacenteJogadorA, _]|TAdjacente], [EstadoJogadorA, EstadoJogadorB], b, Altura, Modo,IndiceAdjacente, [ValorMiniMax|NotasTail], [Simples|SimplesTail]):-
 	IndiceMaisUm is IndiceAdjacente + 1,
 	minimax([HAdjacenteJogadorA, EstadoJogadorB], b, [EstadoJogadorA, EstadoJogadorB], Altura, Modo, IndiceAdjacente, ValorMiniMax, Simples),
 	paraCadaAdjacente(TAdjacente, [EstadoJogadorA, EstadoJogadorB], b, Altura, Modo, IndiceMaisUm, NotasTail, SimplesTail).
@@ -88,8 +91,8 @@ inverteModo(menor, maior).
 inverteJogador(a, b).
 inverteJogador(b, a).
 
-elemento([H|T], 0, H).
-elemento([H|T], Indice, Elemento):-
+elemento([H|_], 0, H).
+elemento([_|T], Indice, Elemento):-
 	NovoIndice is Indice - 1,
 	elemento(T, NovoIndice, Elemento).
 
@@ -135,11 +138,11 @@ heuristica_vertical(Lista, [Linha, Coluna],  Pontuacao):-
 	score(Contado, Pontuacao).
 
 contaColuna([], _, 0).
-contaColuna([[ListaLinha, ListaColuna]|T], [Linha, Coluna], Total):-
+contaColuna([[_, ListaColuna]|T], [Linha, Coluna], Total):-
 	contaColuna(T, [Linha, Coluna], TotalDentro),
 	Coluna is ListaColuna,
 	Total is TotalDentro + 1.
-contaColuna([[ListaLinha, ListaColuna]|T], [Linha, Coluna], Total):-
+contaColuna([[_, _]|T], [Linha, Coluna], Total):-
 	contaColuna(T, [Linha, Coluna], Total).
 
 heuristica_diagonal(Lista, [Linha, Coluna],  Total):-
